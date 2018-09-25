@@ -1,0 +1,41 @@
+version: "3"
+services:
+    selenium-hub:
+        image: selenium/hub
+        container_name: selenium-hub
+        restart: always
+        ports:
+          - 4444:4444
+    chrome:
+        image: selenium/node-chrome
+        depends_on:
+          - selenium-hub
+        restart: always
+        environment:
+          - HUB_HOST=selenium-hub
+          - HUB_PORT=4444
+        ports:
+          - 5910:5910
+    firefox:
+        image: selenium/node-firefox
+        volumes:
+          - /dev/shm:/dev/shm
+        depends_on:
+          - selenium-hub
+        restart: always
+        environment:
+          - HUB_HOST=selenium-hub
+          - HUB_PORT=4444
+        ports:
+         - 32772:5900
+    nodeSetup:
+        image: timbru31/java-node
+        volumes:
+          - ./script:/usr/src/app/serenityjs
+        working_dir: /usr/src/app/serenityjs
+        command:
+          - sh
+          - '-c'
+          - 'npm install-test'
+        ports:
+          - 7070:7070
